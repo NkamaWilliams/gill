@@ -25,4 +25,4 @@ export * from "@solana/wallet-standard-features";
 export * from "@wallet-standard/core";
 export * from "@wallet-standard/react";
 
-export { useSignIn } from "./hooks/signIn.js";
+export { useSignIn } from "./hooks/sign-in.js";
