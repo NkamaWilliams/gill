@@ -19,7 +19,7 @@ interface UseSignInReturn {
   signIn: () => Promise<SolanaSignInOutput>;
 }
 
-export function useSolanaSignIn({ config }: { config?: SignInConfig }): UseSignInReturn {
+export function useSignIn({ config }: { config?: SignInConfig }): UseSignInReturn {
   const { wallet, account } = useWallet();
 
   const mutation = useMutation<SolanaSignInOutput, Error>({

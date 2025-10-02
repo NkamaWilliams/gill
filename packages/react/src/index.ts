@@ -24,3 +24,5 @@ export * from "@solana/react";
 export * from "@solana/wallet-standard-features";
 export * from "@wallet-standard/core";
 export * from "@wallet-standard/react";
+
+export { useSignIn } from "./hooks/signIn.js";
