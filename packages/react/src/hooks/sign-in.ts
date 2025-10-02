@@ -7,6 +7,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { getWalletFeature } from "@wallet-standard/react";
 
+import { GILL_HOOK_CLIENT_KEY } from "../const.js";
 import { useWallet } from "./wallet.js";
 
 type SignInConfig = Omit<SolanaSignInInput, "address">;
@@ -30,6 +31,7 @@ export function useSignIn({ config }: { config?: SignInConfig }) {
       const [result] = await signInFeature.signIn({ ...config, address: account.address }); // Only getting results from first account
       return result;
     },
+    mutationKey: [GILL_HOOK_CLIENT_KEY, "signIn"],
     networkMode: "offlineFirst",
   });
 
