@@ -7,19 +7,11 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { getWalletFeature } from "@wallet-standard/react";
 
-import { GILL_HOOK_CLIENT_KEY } from "../const.js";
 import { useWallet } from "./wallet.js";
 
 type SignInConfig = Omit<SolanaSignInInput, "address">;
 
-interface UseSignInReturn {
-  error: Error | null;
-  isLoading: boolean;
-  output: SolanaSignInOutput | undefined;
-  signIn: () => Promise<SolanaSignInOutput>;
-}
-
-export function useSignIn({ config }: { config?: SignInConfig }): UseSignInReturn {
+export function useSignIn({ config }: { config?: SignInConfig }) {
   const { wallet, account } = useWallet();
 
   const mutation = useMutation<SolanaSignInOutput, Error>({
@@ -38,15 +30,7 @@ export function useSignIn({ config }: { config?: SignInConfig }): UseSignInRetur
       const [result] = await signInFeature.signIn({ ...config, address: account.address }); // Only getting results from first account
       return result;
     },
-    mutationKey: [GILL_HOOK_CLIENT_KEY, "signIn"],
     networkMode: "offlineFirst",
-    retry: (failureCount, error) => {
-      if (error.message.toLowerCase().includes("denied") || error.message.toLowerCase().includes("rejected"))
-        return false; // don’t retry on user rejection
-      console.log(error);
-      return failureCount < 3;
-    },
-    retryDelay: (index) => Math.min(1000 * 2 ** index, 3000),
   });
 
   return {
