@@ -1,44 +1,43 @@
-import {
-  SolanaSignIn,
-  type SolanaSignInFeature,
-  SolanaSignInInput,
-  SolanaSignInOutput,
-} from "@solana/wallet-standard-features";
-import { useMutation } from "@tanstack/react-query";
-import { getWalletFeature } from "@wallet-standard/react";
+import { useSignIn } from "@solana/react";
+import { SolanaSignInInput, SolanaSignInOutput } from "@solana/wallet-standard-features";
+import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
+import type { UiWallet, UiWalletAccount } from "@wallet-standard/react";
 
 import { GILL_HOOK_CLIENT_KEY } from "../const.js";
-import { useWallet } from "./wallet.js";
 
-type SignInConfig = Omit<SolanaSignInInput, "address">;
+type SignInInput = Omit<SolanaSignInInput, "address">;
 
-export function useSignIn({ config }: { config?: SignInConfig }) {
-  const { wallet, account } = useWallet();
+// Output of @solana/react useSignIn signIn function
+type Output = Omit<SolanaSignInOutput, "account" | "signatureType"> &
+  Readonly<{
+    account: UiWalletAccount;
+  }>;
 
-  const mutation = useMutation<SolanaSignInOutput, Error>({
-    mutationFn: async (): Promise<SolanaSignInOutput> => {
-      if (!wallet) throw new Error("Wallet not connected");
-      if (!account) throw new Error("No account found");
+export function useSolanaSignIn(wallet: UiWallet, input?: SignInInput, config?: UseMutationOptions) {
+  let signInFn: ((input?: SolanaSignInInput) => Promise<Output>) | null = null;
+  let isSupported = true;
 
-      const signInFeature = getWalletFeature(wallet, SolanaSignIn) as
-        | SolanaSignInFeature[typeof SolanaSignIn]
-        | undefined;
+  // Try to get the feature else warn user that is is not supported (else it can crash frontends)
+  try {
+    signInFn = useSignIn(wallet);
+  } catch (e) {
+    isSupported = false;
+    console.warn(e);
+  }
+  const mutation = useMutation({
+    mutationFn: async (): Promise<Output> => {
+      if (!signInFn || !isSupported) throw new Error("Wallet does not support the sign in feature");
 
-      if (!signInFeature) {
-        throw new Error("Wallet does not implement the sign in feature");
-      }
-
-      const [result] = await signInFeature.signIn({ ...config, address: account.address }); // Only getting results from first account
+      const result = await signInFn({ ...input });
       return result;
     },
     mutationKey: [GILL_HOOK_CLIENT_KEY, "signIn"],
     networkMode: "offlineFirst",
+    ...config,
   });
 
   return {
-    error: mutation.error,
-    isLoading: mutation.isPending,
-    output: mutation.data,
-    signIn: mutation.mutateAsync,
+    mutation,
+    supported: isSupported,
   };
 }
