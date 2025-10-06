@@ -5,15 +5,13 @@ import type { UiWallet, UiWalletAccount } from "@wallet-standard/react";
 
 import { GILL_HOOK_CLIENT_KEY } from "../const.js";
 
-type SignInInput = Omit<SolanaSignInInput, "address">;
-
 // Output of @solana/react useSignIn signIn function
 type Output = Omit<SolanaSignInOutput, "account" | "signatureType"> &
   Readonly<{
     account: UiWalletAccount;
   }>;
 
-export function useSolanaSignIn(wallet: UiWallet, input?: SignInInput, config?: UseMutationOptions) {
+export function useSolanaSignIn(wallet: UiWallet, input?: SolanaSignInInput, config?: UseMutationOptions) {
   let signInFn: ((input?: SolanaSignInInput) => Promise<Output>) | null = null;
   let isSupported = true;
 
