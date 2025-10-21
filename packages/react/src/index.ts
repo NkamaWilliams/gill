@@ -25,3 +25,4 @@ export * from "@solana/wallet-standard-features";
 export * from "@wallet-standard/core";
 export * from "@wallet-standard/react";
 
+export { useSignMessage } from "./hooks/sign-message.js"
