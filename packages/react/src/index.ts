@@ -31,3 +31,4 @@ export * from "@wallet-standard/core";
 export * from "@wallet-standard/react";
 
 export { useSolanaSignIn as useSignIn } from "./hooks/sign-in.js";
+export { useSignMessage } from "./hooks/sign-message.js"
